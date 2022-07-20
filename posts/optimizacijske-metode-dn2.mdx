@@ -1,0 +1,146 @@
+---
+title: Optimizacijske metode - Modeliranje nakupa z razvažanjem!?
+tags:
+  - math
+  - optimization
+  - lang:slo
+date: 2022-05-25
+excerpt: Kako lahko s programiranjem razvozimo nakupljene loparje.
+---
+
+# Optimizacijske Metode DN2
+
+## Naloga 1
+
+V športni trgovini morajo nabaviti pet različnih tipov teniških loparjev. Trgovci imajo omejitev proizvodnje loparjev, prav tako pa noben od dobaviteljev ne more dobaviti več kot 100 loparjev tipa 1.
+$$
+\begin{array}{}
+\text{Proizvajalec}   & \text{Tip:}                                                  & 1   & 2   & 3   & 4   & 5   &\\
+                      & \text{ Proizvodnja} \downarrow \text{Potreba} \rightarrow    & 300 & 200 & 150 & 500 & 400 &\\
+\text{A}              & 600                                                          & 11  & 14  & 17  & 9   & 6   &\\
+\text{B}              & 500                                                          & 12  & 13  & 18  & 7   & 4   &\\
+\text{C}              & 300                                                          & 10  & 14  & 19  & 8   & 5   &\\
+\text{D}              & 400                                                          & 13  & 11  & 16  & 10  & 7   &\\
+\end{array}
+$$
+$$
+\begin{array}{}
+\text{max} & {t} \quad &\\
+\text{p.p.} & A't \leq b' &\\
+&\ t \geq 0 \end{array}\\
+\textrm{in} \\
+\begin{array}{}
+\text{min} & {t} \quad &\\
+\text{p.p.} & A't \leq b' &\\
+&\ t \geq 0 \end{array}
+$$
+Problem lahko predstavimo kot problem najcenejšega razvoza z omejitvami. Vozlišča bodo sestavljena iz proizvajalcev in tipov loparjev (dvodelni graf), povezave pa bodo povezovale vse proizvajalce z vsemi tipi loparjev. Opazimo, da je vsota proizvodnje enaka $600+500+300+400=1800$, poraba pa le $300+200+150+500+400=1550$, torej bomo morali dodati tudi smetišče, ki bo potrebovalo še $250$ odvečnih loparjev. Povezave do smetišča ne bodo imele omejitve in cene. Vozlišča $V$ in povezave $E$ definiramo na sledeč način:
+
+$$
+D= \{A, B, C,D\} \quad \text{// dobavitelji} \newline
+T = \{1,2,3,4,5\} \quad \text{// tipi} \\\\
+V = D\ \cup \ \ T\ \cup \ \{ S \}  \quad \text{// dodamo še smetišče} \\
+E = \{e_{ij} \ | \ i \in D, j \in T\cup \{S\}\} \\
+$$
+
+Cene povezav preberemo iz tabele. Ker so vse vrednosti dobički, jih bomo obravnavali kot negativne cene.
+
+<Image src="/images/om_Naloga1_Graf1.png" alt="Naloga1_Graf1" layout="responsive" width="333" height="250"/>
+
+Sedaj lahko problem rešimo kot linearni program, pri katerem minimiziramo kriterijsko funkcijo, kjer skalarno pomnožimo vektorja prenesenih loparjev po povezavi z vektorjem cen prenašanja po povezavi. Pogoji optimalne rešitve so, da so povezave $A1, …, D1$ manjše ali enake $100$, in vsi vnosi celoštevilski. Veljati morajo tudi Kirchhoffi zakoni za vsa vozlišča:
+
+```
+Dobavitelj_A_izvoz: - Povezava_A1 - Povezava_A2 - Povezava_A3 - Povezava_A4 - Povezava_A5 - Povezava_AS = -600
+Dobavitelj_B_izvoz: - Povezava_B1 - Povezava_B2 - Povezava_B3 - Povezava_B4 - Povezava_B5 - Povezava_BS = -500
+Dobavitelj_C_izvoz: - Povezava_C1 - Povezava_C2 - Povezava_C3 - Povezava_C4 - Povezava_C5 - Povezava_CS = -300
+Dobavitelj_D_izvoz: - Povezava_D1 - Povezava_D2 - Povezava_D3 - Povezava_D4 - Povezava_D5 - Povezava_DS = -400
+Lopar_1_dovoz: Povezava_A1 + Povezava_B1 + Povezava_C1 + Povezava_D1 = 300
+Lopar_2_dovoz: Povezava_A2 + Povezava_B2 + Povezava_C2 + Povezava_D2 = 200
+Lopar_3_dovoz: Povezava_A3 + Povezava_B3 + Povezava_C3 + Povezava_D3 = 150
+Lopar_4_dovoz: Povezava_A4 + Povezava_B4 + Povezava_C4 + Povezava_D4 = 500
+Lopar_5_dovoz: Povezava_A5 + Povezava_B5 + Povezava_C5 + Povezava_D5 = 400
+Smetisce_dovoz: Povezava_AS + Povezava_BS + Povezava_CS + Povezava_DS = 250
+```
+
+Linearni program lahko rešimo z računalnikom in odčitamo optimalno rešitev in optimalno vrednost.
+
+<Image src="/images/om_Naloga1_Graf3.png" alt="Naloga1_Graf3" layout="responsive" width="333" height="222" />
+
+```txt
+Od A dobavimo 100 loparjev tipa 1. (Dobicek: 1100)
+Od A dobavimo 200 loparjev tipa 4. (Dobicek: 1800)
+Od A dobavimo 300 loparjev tipa 5. (Dobicek: 1800)
+Od B dobavimo 100 loparjev tipa 1. (Dobicek: 1200)
+Od B dobavimo  50 loparjev tipa 2. (Dobicek: 650)
+Od B dobavimo 100 loparjev tipa 5. (Dobicek: 400)
+Od C dobavimo 150 loparjev tipa 2. (Dobicek: 2100)
+Od C dobavimo 150 loparjev tipa 3. (Dobicek: 2850)
+Od D dobavimo 100 loparjev tipa 1. (Dobicek: 1300)
+Od D dobavimo 300 loparjev tipa 4. (Dobicek: 3000)
+Vsota: 16200
+```
+
+Optimalna vrednost programa, v katerem smo minimiziramo stroške je -16200, oz. 16200 dobička.
+
+## Naloga 2
+
+Za danih $2n$ točk v ravnini, je $n$ točk rdečih, $n$ točk modrih. Treba je poiskati popolno prirejanje med točkami, pri katerem so vse povezave bikromatične in je dolžina najdaljše povezave čim manjša.
+
+Ideja reševanja: Izračunamo dolžine vseh povezav v polnem dvodelnem grafu $ K_{n,n} $ in jih uredimo po dolžini naraščujoče v zaporedje $ E=(e_1, \ e_2, \ ... \ ,e_{n^2}  ) $. Iščemo najkrajše podzaporedje $F_i$, da bo $F_i = (e_1, \ … \ ,e_i), \ i \le n^2$, iz katerih povezav bomo lahko še vedno naredili največje prirejanje, ki bo vezalo vsa vozlišča. Potem bo cena takega prirejanja enaka dolžini povezave $e_i$. Če te povezave ne bi uporabili v prirejanju, bi lahko vzeli podzaporedje do $e_{i-1}$, kar bi bilo protislovje z definicijo $F_i$. Množica takih podzaporedij zagotovo vsebuje vsaj en element, ker je $F_{n^2}$poln dvodelen graf, ki ima popolno prirejanje. To bo neka poljubna bijekcija med
+$\{1, … , n\}$ in $\{n+1, … , 2n\}$.
+
+Za iskanje najmanjšega takega $i$ lahko uporabimo bisekcijo, ki je odvisen od logaritma velikosti prostora, madžarska metoda za iskanje največjega popolnega prirejanja pa od kuba velikosti prostora. Torej bo časovna zahtevnost algoritma navzgor omejena z:
+
+$$
+T_{a}(n)=n^2+\log(n^2)\cdot n^3 \approx n^3\log(n) \\
+n^2 \text{ - računanje dolžin povezav} \\
+log(n^2) \text{ - bisekcija po povezavah} \\
+n^3 \text{ - iskanje najve\v{c}jega prirejanja}
+$$
+
+Dva možna dodatka algoritmu:
+
+- Pred začetkem bisekcije bi lahko z linearnim algoritmom našli najmanjši indeks, ki zadošča pogoju, da je vsako vozlišče incidenčno vsaj eni povezavi (oz. da je digraf povezan). Potem bi to nastavili za najmanjši dopustni indeks bisekcije. Največji indeks bi ostal $n^2$.
+- Pred začetkem madžarske metode za iskanje bi lahko prosta vozlišča, ki imajo samo enega prostega soseda, kar neposredno s svojim sosedom in to rekurzivno ponovili, dokler nimajo vsa prosta vozlišča večih sosedov. Na tak način bi lahko bolj efektivno izvajali nadaljne iteracije.
+
+Ker operiramo z majhnim deležom podatkov, se za prvi dodatek nisem odločil, ker bisekcija še vedno odtehta linearno iskanje, implementiral pa sem drugi dodatek.
+
+Reševanje problema za naslednje podatke:
+(Točke imajo zaporedni indeks, najprej rdeče, potem modre)
+
+```txt
+Rdeče točke: (7, 9), (9, 9), (4, 6), (7, 5), (7, 8), (3, 1), (9, 4), (2, 6)
+Modre točke: (1, 10), (5, 6), (9, 0), (4, 8), (6, 9), (7, 8), (8, 6), (8, 4)
+```
+
+<Image src="/images/om_Naloga2_graf.png" alt="Naloga2_graf" layout="responsive" width="333" height="222"  />
+
+Imamo 16 vozlišč in poln dvodelni graf $K_{8,8}$ s 64 povezavami.
+
+<Image src="/images/om_Naloga2_graf_K88.png" alt="Naloga2_graf_K88" layout="responsive" width="333" height="222"  />
+
+Algoritem bisekcije poženemo med 0 in 64. Prvi poskus največjega prirejanja z 32 povezavami:
+
+<Image src="/images/om_temp2.png" alt="temp2" layout="responsive" width="333" height="222"   />
+
+Ker nismo mogli najti popolnega prirejanja, se osredotočimo na interval med 33 in 64.
+
+<Image src="/images/om_temp3.png" alt="temp3" layout="responsive" width="333" height="222"   />
+
+Na naslednjem koraku uspešno najdemo popolno prirejanje, zato se osredotočimo na interval med 33 in 48. Taki izpisi se ponavljajo, dokler rekurzija ne naredi zadnjega koraka. Skupaj je program naredil 6 bisekcijskih korakov. Končno prirejanje, ki ga najdemo je:
+
+<Image src="/images/om_temp6.png" alt="temp6" layout="responsive" width="333" height="222"  />
+
+```
+Povezava  5-9  ima dolžino 5.3852
+Povezava  0-12 ima dolžino 1.0000
+Povezava  1-13 ima dolžino 2.2361
+Povezava  2-11 ima dolžino 2.0000
+Povezava  3-14 ima dolžino 1.4142
+Povezava  6-10 ima dolžino 4.0000
+Povezava  7-8  ima dolžino 4.1231
+Povezava  4-15 ima dolžino 4.1231
+```
+
+Katerega najdaljša povezava ima kvadrat norme 29, oz. normo $5,3852$.
+
